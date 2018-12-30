@@ -56,7 +56,7 @@ def get_last_answer(row):
         return row[FIRST_ANSWER_COLUMN_INDEX]
 
     # 回答を後ろから初回回答へ検索し、最初にヒットした回答を「最終回答」とする
-    for i in range(LAST_ANSWER_COLUMN_INDEX, FIRST_ANSWER_COLUMN_INDEX, -1):
+    for i in range(LAST_ANSWER_COLUMN_INDEX, FIRST_ANSWER_COLUMN_INDEX - 1, -1):
         if row[i] != "":
             return row[i]
 
