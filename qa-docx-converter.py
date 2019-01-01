@@ -3,30 +3,16 @@
 import configparser
 import csv
 import docx
-# --------------------------------------------------------
-# ▼仕様
-# ・CSVファイルに含まれる「見出し」「質問」「回答」を
-#   Wordファイルに転記します。
-# ・CSVファイルは、当pyファイルと同一ディレクトリ内に存在すること、
-#   パラメータ設定「config.ini」も同ディレクトリ内に存在すること、
-#   Wordファイルも、同ディレクトリ内に作成or上書きされることを
-#   想定しています。
-# ・CSVファイル1行につき1つの質問、
-#   質問に対する回答は1〜n回分あることを想定しています。
-# ・Wordファイルに転記する回答は「最終回答」のみとします。
-# ・1見出し/質問/回答を出力後に改ページします。
-# ・「見出し」のスタイルは0:Title固定、
-#   「質問」「回答」(小見出し)のスタイルは1:Heading 1固定、
-#   「質問」「回答」の内容自体はスタイル指定なしとします。
-# ・Title、Heading 1の書式はWord側で適宜編集してください。
-# ・config.iniにファイル名、列インデックスを指定してください。
+import os
+from datetime import datetime
+
 # --------------------------------------------------------
 # パラメータ設定(config.iniより取得)
 config = configparser.ConfigParser()
 
 try:
     # configのファイルを開く
-    config.read('config.ini')
+    config.read('./config/config.ini')
     # セクションを取得
     file_section = config['FILE_NAME']
     index_section = config['COLUMN_INDEX']
@@ -64,9 +50,14 @@ def get_last_answer(row):
     return ""
 
 # --------------------------------------------------------
-# カレントディレクトリにあるCSVファイルオープン
+# csvフォルダにあるCSVファイルオープン
+csv_path = "./csv/" + CSV_FILE_NAME
+if not os.path.isfile(csv_path):
+    print("csvフォルダに"+CSV_FILE_NAME+"が存在しません。")
+    exit()
+
 csv_file = \
-    open("./" + CSV_FILE_NAME, "r", encoding="utf_8", errors="", newline="" )
+    open(csv_path, "r", encoding="utf_8", errors="", newline="" )
 
 # Wordファイル新規作成
 doc = docx.Document()
@@ -93,6 +84,16 @@ for row in csv_rows:
     # 改ページ
     doc.add_page_break()
 
-# Wordファイルをカレントディレクトリに保存
-doc.save(DOCX_FILE_NAME)
+# Wordファイルの新規作成or上書き
+docx_path = "./docx/"+DOCX_FILE_NAME
+if os.path.isfile(docx_path):
+    choice = input("同名ファイルが既に存在します。リネームして退避しますか？\
+        \nはい → y(=n以外) いいえ → n：")
+    # 同名ファイルをリネームして退避
+    if choice != "n":
+        current_date = datetime.now().strftime('%y%m%d%H%M%S')
+        os.rename(docx_path, str.rstrip(docx_path, ".docx") + current_date + ".docx")
+
+# Wordファイルをdocxフォルダに保存
+doc.save(docx_path)
 print(DOCX_FILE_NAME+"を作成しました。")
