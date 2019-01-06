@@ -67,11 +67,11 @@ csv_rows = \
     csv.reader(csv_file, delimiter=",", doublequote=True, \
     lineterminator="\r\n", quotechar='"', skipinitialspace=True)
 
-# 1行目のヘッダは読み飛ばし
-header = next(csv_rows)
-
 # 2行目以降をWordファイルに転記
 for row in csv_rows:
+    # 1行目のヘッダは読み飛ばし
+    if csv_rows.line_num == 1:
+        continue
     # 見出し
     doc.add_heading(row[TITLE_COLUMN_INDEX], 0)
     # 質問
