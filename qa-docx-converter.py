@@ -1,12 +1,17 @@
 # Python3
-# utf-8
+# coding: utf-8
 import configparser
 import csv
 import docx
 import os
 from datetime import datetime
 
-# --------------------------------------------------------
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+# 注：shift_jis環境で使用する場合は、
+# 1.coding: shift_jisとすること！！
+# 2.バックスラッシュ(使用不可)を¥に置換すること！！
+# 3.config.iniをencoding = shift_jisとすること！！
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 # パラメータ設定(config.iniより取得)
 config = configparser.ConfigParser()
 
@@ -14,10 +19,14 @@ try:
     # configのファイルを開く
     config.read('./config/config.ini')
     # セクションを取得
+    encoding_section = config['ENCODING']
     file_section = config['FILE_NAME']
     index_section = config['COLUMN_INDEX']
 
     # パラメータの読み込み
+    # エンコード
+    ENCODING = encoding_section.get('encoding')
+
     # 各ファイル名
     CSV_FILE_NAME = file_section.get('csv_file')
     DOCX_FILE_NAME = file_section.get('docx_file')
@@ -57,7 +66,7 @@ if not os.path.isfile(csv_path):
     exit()
 
 csv_file = \
-    open(csv_path, "r", encoding="utf_8", errors="", newline="" )
+    open(csv_path, "r", encoding=ENCODING, errors="", newline="" )
 
 # Wordファイル新規作成
 doc = docx.Document()
